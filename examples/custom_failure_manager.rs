@@ -3,15 +3,15 @@ use bevy_intro_screen::prelude::*;
 
 fn main() {
     let transition_to = AppState::Menu;
-    let preferences = SplashPreferences::builder()
-        .run_at(AppState::SplashScreen)
+    let preferences = IntroPreferences::builder()
+        .run_at(AppState::IntroScreen)
         .transition_to(transition_to)
         .skip_on_input(true)
         .duration(FixedDuration::new(transition_to))
-        .ui(GameSplashScreen)
+        .ui(GameIntroScreen)
         .build();
 
-    let splash_plugin = SplashScreenPlugin::builder()
+    let splash_plugin = IntroScreenPlugin::builder()
         .preferences(preferences)
         // Use multiple failure stragies together
         .failure_manager(LogFailure.and(OnFailureCloseWindowWithDelay(
@@ -26,12 +26,12 @@ fn main() {
 
 #[derive(Clone)]
 pub struct LogFailure;
-impl SplashFailureManager for LogFailure {
-    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<SplashState>)
+impl IntroFailureManager for LogFailure {
+    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<IntroState>)
     where
         S: States + bevy::state::state::FreelyMutableState,
-        D: SplashDuration,
-        U: ShowSplashScreen,
+        D: IntroDuration,
+        U: ShowIntroScreen,
     {
         app.add_systems(schedule, log);
     }
@@ -44,19 +44,19 @@ fn log(_: Commands) {
 /// Same ----
 #[derive(States, Clone, PartialEq, Eq, Hash, Debug, Copy)]
 pub enum AppState {
-    SplashScreen,
+    IntroScreen,
     Menu,
 }
 
 #[derive(Clone)]
-pub struct GameSplashScreen;
+pub struct GameIntroScreen;
 
-impl ShowSplashScreen for GameSplashScreen {
-    fn configure_ui<S, D, U>(&self, _: &mut App, _: &SplashPreferences<S, D, U>)
+impl ShowIntroScreen for GameIntroScreen {
+    fn configure_ui<S, D, U>(&self, _: &mut App, _: &IntroPreferences<S, D, U>)
     where
         S: States,
-        D: SplashDuration,
-        U: ShowSplashScreen,
+        D: IntroDuration,
+        U: ShowIntroScreen,
     {
         // Do nothing
     }

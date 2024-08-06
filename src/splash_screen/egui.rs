@@ -9,11 +9,11 @@ use bevy_egui::{
     EguiContexts, EguiPlugin,
 };
 
-use super::{is_running, ShowSplashScreen, SplashFailureManager};
+use super::{is_running, ShowIntroScreen, IntroFailureManager};
 
 #[derive(Resource, Clone)]
 #[bon::builder]
-pub struct EguiSplashScreen<'a> {
+pub struct EguiIntroScreen<'a> {
     background: Option<ImageSource<'a>>,
     icon: ImageSource<'a>,
     label: Cow<'a, str>,
@@ -25,18 +25,18 @@ pub struct OnFailureShowMessage<T>(pub T)
 where
     T: Clone + AsRef<str> + Send + Sync + 'static;
 
-impl<'a> ShowSplashScreen for EguiSplashScreen<'a>
+impl<'a> ShowIntroScreen for EguiIntroScreen<'a>
 where
     'a: 'static,
 {
     fn configure_ui<S, D, U>(
         &self,
         app: &mut bevy::prelude::App,
-        _: &super::SplashPreferences<S, D, U>,
+        _: &super::IntroPreferences<S, D, U>,
     ) where
         S: bevy::prelude::States,
-        D: super::SplashDuration,
-        U: ShowSplashScreen,
+        D: super::IntroDuration,
+        U: ShowIntroScreen,
     {
         app.add_plugins(EguiPlugin);
 
@@ -46,7 +46,7 @@ where
     }
 }
 
-fn splash(contexts: EguiContexts, assets: Res<EguiSplashScreen<'static>>) {
+fn splash(contexts: EguiContexts, assets: Res<EguiIntroScreen<'static>>) {
     CentralPanel::default().show(contexts.ctx(), |ui| {
         if let Some(background) = &assets.background {
             // https://github.com/emilk/egui/discussions/3383#discussioncomment-7373747
@@ -76,17 +76,17 @@ struct FailureMessageResource<T>(T)
 where
     T: AsRef<str> + Send + Sync + 'static;
 
-impl<T> SplashFailureManager for OnFailureShowMessage<T>
+impl<T> IntroFailureManager for OnFailureShowMessage<T>
 where
     T: Clone + AsRef<str> + Send + Sync + 'static,
 {
-    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<super::SplashState>)
+    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<super::IntroState>)
     where
         S: States + bevy::state::state::FreelyMutableState,
-        D: super::SplashDuration,
-        U: ShowSplashScreen,
+        D: super::IntroDuration,
+        U: ShowIntroScreen,
     {
-        let on_exit_schedule: OnExit<super::SplashState> = OnExit(schedule.0.clone());
+        let on_exit_schedule: OnExit<super::IntroState> = OnExit(schedule.0.clone());
         let message_resource = FailureMessageResource(self.0.clone());
 
         app.insert_resource(message_resource)

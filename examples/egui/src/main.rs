@@ -3,15 +3,15 @@ use bevy_intro_screen::prelude::*;
 
 fn main() {
     let transition_to = AppState::GameMenu;
-    let preferences = SplashPreferences::builder()
-        .run_at(AppState::SplashScreen)
+    let preferences = IntroPreferences::builder()
+        .run_at(AppState::IntroScreen)
         .transition_to(transition_to)
         .skip_on_input(true)
         .duration(FixedDuration::new(transition_to))
-        .ui(GameSplashScreen)
+        .ui(GameIntroScreen)
         .build();
 
-    let splash_plugin = SplashScreenPlugin::builder()
+    let splash_plugin = IntroScreenPlugin::builder()
         .preferences(preferences)
         .failure_manager(OnFailureContinue)
         .build();
@@ -24,24 +24,24 @@ fn main() {
 
 
 #[derive(Clone)]
-pub struct GameSplashScreen;
+pub struct GameIntroScreen;
 
-impl GameSplashScreen {
+impl GameIntroScreen {
     pub(super) const LABEL: &'static str = "Custom Egui Example";
 }
 
-impl ShowSplashScreen for GameSplashScreen {
-    fn configure_ui<S, D, U>(&self, app: &mut App, preferences: &SplashPreferences<S, D, U>)
+impl ShowIntroScreen for GameIntroScreen {
+    fn configure_ui<S, D, U>(&self, app: &mut App, preferences: &IntroPreferences<S, D, U>)
     where
         S: States,
-        D: SplashDuration,
-        U: ShowSplashScreen,
+        D: IntroDuration,
+        U: ShowIntroScreen,
     {
         // so that the image loader is loaded and has enought time to do so
         app.add_systems(Startup, setup);
 
             
-        let egui = EguiSplashScreen::builder()
+        let egui = EguiIntroScreen::builder()
             .label(Self::LABEL.into())
             .icon(bevy_egui::egui::include_image!(
                 "../../assets/images/app_logo.png"
@@ -61,6 +61,6 @@ fn setup(contexts: EguiContexts) {
 
 #[derive(States,Clone ,PartialEq , Eq , Hash , Debug,Copy)]
 pub enum AppState {
-    SplashScreen,
+    IntroScreen,
     Menu
 }

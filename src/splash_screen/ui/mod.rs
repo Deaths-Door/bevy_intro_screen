@@ -6,15 +6,15 @@ mod failure;
 pub use assets::*;
 pub use failure::*;
 
-use super::{SplashDuration, SplashPreferences};
+use super::{IntroDuration, IntroPreferences};
 use bevy::prelude::*;
 
 /// This trait provides a generic interface for defining custom splash screen content.
-pub trait ShowSplashScreen: Send + Sync + 'static {
+pub trait ShowIntroScreen: Send + Sync + 'static {
     /// Configures the splash screen UI.
-    fn configure_ui<S, D, U>(&self, app: &mut App, preferences: &SplashPreferences<S, D, U>)
+    fn configure_ui<S, D, U>(&self, app: &mut App, preferences: &IntroPreferences<S, D, U>)
     where
         S: States,
-        D: SplashDuration,
-        U: ShowSplashScreen;
+        D: IntroDuration,
+        U: ShowIntroScreen;
 }

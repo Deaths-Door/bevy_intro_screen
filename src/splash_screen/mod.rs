@@ -8,23 +8,23 @@ pub(super) mod ui;
 use crate::prelude::*;
 use bevy::{prelude::*, state::state::FreelyMutableState};
 use getset::Getters;
-/// The main plugin for Bevy's splash screen system.
+/// The main plugin for Bevy's introduction screen system.
 ///
 /// This plugin manages the splash screen lifecycle, including displaying the screen,
 /// handling asset loading, and managing failures.
 #[bon::builder]
-pub struct SplashScreenPlugin<S, D, U, F>
+pub struct IntroScreenPlugin<S, D, U, F>
 where
     S: States + FreelyMutableState,
-    D: SplashDuration,
-    U: ShowSplashScreen,
-    F: SplashFailureManager,
+    D: IntroDuration,
+    U: ShowIntroScreen,
+    F: IntroFailureManager,
 {
-    preferences: SplashPreferences<S, D, U>,
+    preferences: IntroPreferences<S, D, U>,
     failure_manager: F,
 }
 
-/// Configuration options for the splash screen.
+/// Configuration options for the introduction screen.
 ///
 /// This struct defines the various parameters that control the behavior of the splash screen.
 ///
@@ -35,11 +35,11 @@ where
 /// * `U`: The type responsible for showing the splash screen
 #[derive(Clone, Debug, Resource, Getters)]
 #[bon::builder]
-pub struct SplashPreferences<S, D, U>
+pub struct IntroPreferences<S, D, U>
 where
     S: States,
-    D: SplashDuration,
-    U: ShowSplashScreen,
+    D: IntroDuration,
+    U: ShowIntroScreen,
 {
     #[getset(get = "pub")]
     pub(in crate::splash_screen) run_at: S,
@@ -53,15 +53,15 @@ where
     pub(in crate::splash_screen) ui: U,
 }
 
-impl<S, D, U, F> Plugin for SplashScreenPlugin<S, D, U, F>
+impl<S, D, U, F> Plugin for IntroScreenPlugin<S, D, U, F>
 where
     S: States + FreelyMutableState,
-    D: SplashDuration,
-    U: ShowSplashScreen + Clone,
-    F: SplashFailureManager + Clone,
+    D: IntroDuration,
+    U: ShowIntroScreen + Clone,
+    F: IntroFailureManager + Clone,
 {
     fn build(&self, app: &mut App) {
-        app.init_state::<state::SplashState>()
+        app.init_state::<state::IntroState>()
             .insert_resource(self.preferences.clone())
             .add_systems(OnEnter(self.preferences.run_at.clone()), change_state)
             .add_systems(
@@ -80,16 +80,16 @@ where
         }
 
         self.failure_manager
-            .manage_failure::<S, D, U>(app, OnEnter(SplashState::Failure))
+            .manage_failure::<S, D, U>(app, OnEnter(IntroState::Failure))
     }
 }
 
-fn change_state(mut next_state: ResMut<NextState<state::SplashState>>) {
-    next_state.set(state::SplashState::Loading)
+fn change_state(mut next_state: ResMut<NextState<state::IntroState>>) {
+    next_state.set(state::IntroState::Loading)
 }
 
-fn splash_finish<S: States, D: SplashDuration, U: ShowSplashScreen>(
-    mut next_state: ResMut<NextState<state::SplashState>>,
+fn splash_finish<S: States, D: IntroDuration, U: ShowIntroScreen>(
+    mut next_state: ResMut<NextState<state::IntroState>>,
 ) {
-    next_state.set(state::SplashState::Idle);
+    next_state.set(state::IntroState::Idle);
 }

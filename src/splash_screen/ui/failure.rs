@@ -1,28 +1,28 @@
-use super::ShowSplashScreen;
-use crate::splash_screen::{SplashDuration, SplashPreferences, SplashState};
+use super::ShowIntroScreen;
+use crate::splash_screen::{IntroDuration, IntroPreferences, IntroState};
 use bevy::{prelude::*, state::state::FreelyMutableState};
 use std::{marker::PhantomData, time::Duration};
 
 /// Defines a trait for managing asset loading failures during the splash screen.
-pub trait SplashFailureManager: Send + Sync + 'static {
+pub trait IntroFailureManager: Send + Sync + 'static {
     /// Manages asset loading failures.
     ///
     /// This method is called when the splash screen enters the `Failure` state.
     /// The provided `schedule` should be used to schedule systems or events
     /// to handle the failure
-    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<SplashState>)
+    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<IntroState>)
     where
         S: States + FreelyMutableState,
-        D: SplashDuration,
-        U: ShowSplashScreen;
+        D: IntroDuration,
+        U: ShowIntroScreen;
 
-    /// Combines two `SplashFailureManager` instances into a single one.
+    /// Combines two `IntroFailureManager` instances into a single one.
     ///
     /// The resulting `And` type will sequentially call `manage_failure` on both
     /// instances when invoked
     fn and<B>(self, other: B) -> And<Self, B>
     where
-        B: SplashFailureManager,
+        B: IntroFailureManager,
         Self: Sized,
     {
         And {
@@ -32,14 +32,14 @@ pub trait SplashFailureManager: Send + Sync + 'static {
     }
 }
 
-/// Creates a new `And` instance combining two `SplashFailureManager` instances.
+/// Creates a new `And` instance combining two `IntroFailureManager` instances.
 ///
-/// This is typically created using the [`SplashFailureManager::and`]
+/// This is typically created using the [`IntroFailureManager::and`]
 #[derive(Clone)]
 pub struct And<A, B>
 where
-    A: SplashFailureManager,
-    B: SplashFailureManager,
+    A: IntroFailureManager,
+    B: IntroFailureManager,
 {
     first: A,
     second: B,
@@ -49,7 +49,7 @@ where
 #[derive(Clone)]
 pub struct OnFailureCloseWindow;
 
-/// Continues to the next state (aka [SplashPreferences::transition_to]) when a splash screen failure occurs.
+/// Continues to the next state (aka [IntroPreferences::transition_to]) when a splash screen failure occurs.
 #[derive(Clone)]
 pub struct OnFailureContinue;
 
@@ -57,7 +57,7 @@ pub struct OnFailureContinue;
 #[derive(Clone)]
 pub struct OnFailureCloseWindowWithDelay(pub Duration);
 
-/// Continues to the next state (aka [SplashPreferences::transition_to]) **after a delay** when a splash screen failure occurs.
+/// Continues to the next state (aka [IntroPreferences::transition_to]) **after a delay** when a splash screen failure occurs.
 #[derive(Clone)]
 pub struct OnFailureContinueWithDelay(pub Duration);
 
@@ -80,9 +80,9 @@ impl OnFailureCloseWindow {
 
 impl OnFailureContinue {
     /// Internal system of [OnFailureContinue]
-    pub fn system<S: States + FreelyMutableState, D: SplashDuration, U: ShowSplashScreen>(
+    pub fn system<S: States + FreelyMutableState, D: IntroDuration, U: ShowIntroScreen>(
         mut next_state: ResMut<NextState<S>>,
-        conf: Res<SplashPreferences<S, D, U>>,
+        conf: Res<IntroPreferences<S, D, U>>,
     ) {
         next_state.set(conf.transition_to.clone())
     }
@@ -108,53 +108,53 @@ where
     }
 }
 
-impl<A, B> SplashFailureManager for And<A, B>
+impl<A, B> IntroFailureManager for And<A, B>
 where
-    A: SplashFailureManager,
-    B: SplashFailureManager,
+    A: IntroFailureManager,
+    B: IntroFailureManager,
 {
-    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<SplashState>)
+    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<IntroState>)
     where
         S: States + FreelyMutableState,
-        D: SplashDuration,
-        U: ShowSplashScreen,
+        D: IntroDuration,
+        U: ShowIntroScreen,
     {
         self.first.manage_failure::<S, D, U>(app, schedule.clone());
         self.second.manage_failure::<S, D, U>(app, schedule);
     }
 }
 
-impl SplashFailureManager for OnFailureCloseWindow {
-    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<SplashState>)
+impl IntroFailureManager for OnFailureCloseWindow {
+    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<IntroState>)
     where
         S: States + FreelyMutableState,
-        D: SplashDuration,
-        U: ShowSplashScreen,
+        D: IntroDuration,
+        U: ShowIntroScreen,
     {
         app.add_systems(schedule, Self::system);
     }
 }
 
-impl SplashFailureManager for OnFailureContinue {
-    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<SplashState>)
+impl IntroFailureManager for OnFailureContinue {
+    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<IntroState>)
     where
         S: States + FreelyMutableState,
-        D: SplashDuration,
-        U: ShowSplashScreen,
+        D: IntroDuration,
+        U: ShowIntroScreen,
     {
         app.add_systems(schedule, Self::system::<S, D, U>);
     }
 }
 
-impl<T> SplashFailureManager for WithDelay<T>
+impl<T> IntroFailureManager for WithDelay<T>
 where
     T: Resource + Clone,
 {
-    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<SplashState>)
+    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<IntroState>)
     where
         S: States + FreelyMutableState,
-        D: SplashDuration,
-        U: ShowSplashScreen,
+        D: IntroDuration,
+        U: ShowIntroScreen,
     {
         app.insert_resource(self.clone())
             .add_systems(schedule, Self::system);
@@ -168,12 +168,12 @@ macro_rules! with_delay_impl {
         #[derive(Resource,Clone)]
         struct $marker;
 
-        impl SplashFailureManager for $name {
-    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<SplashState>)
+        impl IntroFailureManager for $name {
+    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<IntroState>)
     where
         S: States + FreelyMutableState,
-        D: SplashDuration,
-        U: ShowSplashScreen,
+        D: IntroDuration,
+        U: ShowIntroScreen,
     {
         let delay = WithDelay::<$marker>::new(self.0.clone());
         delay.manage_failure::<S,D,U>(app,schedule.clone());
@@ -187,12 +187,12 @@ macro_rules! with_delay_impl {
 #[derive(Resource, Clone)]
 struct CloseWindowDelayMaker;
 
-impl SplashFailureManager for OnFailureCloseWindowWithDelay {
-    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<SplashState>)
+impl IntroFailureManager for OnFailureCloseWindowWithDelay {
+    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<IntroState>)
     where
         S: States + FreelyMutableState,
-        D: SplashDuration,
-        U: ShowSplashScreen,
+        D: IntroDuration,
+        U: ShowIntroScreen,
     {
         let delay = WithDelay::<CloseWindowDelayMaker>::new(self.0.clone());
         delay.manage_failure::<S, D, U>(app, schedule.clone());
@@ -206,12 +206,12 @@ impl SplashFailureManager for OnFailureCloseWindowWithDelay {
 #[derive(Resource, Clone)]
 struct ContinueDelayMaker;
 
-impl SplashFailureManager for OnFailureContinueWithDelay {
-    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<SplashState>)
+impl IntroFailureManager for OnFailureContinueWithDelay {
+    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<IntroState>)
     where
         S: States + FreelyMutableState,
-        D: SplashDuration,
-        U: ShowSplashScreen,
+        D: IntroDuration,
+        U: ShowIntroScreen,
     {
         let delay = WithDelay::<ContinueDelayMaker>::new(self.0.clone());
         delay.manage_failure::<S, D, U>(app, schedule.clone());

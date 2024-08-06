@@ -27,7 +27,7 @@ fn main() {
     let transition_to = ..;
     // Included options include using egui;
     let ui = ..;
-    let preferences = SplashPreferences::builder()
+    let preferences = IntroPreferences::builder()
         .run_at(run_at)
         .transition_to(transition_to)
         .skip_on_input(true)
@@ -35,7 +35,7 @@ fn main() {
         .ui(ui)
         .build();
 
-    let splash_plugin = SplashScreenPlugin::builder()
+    let splash_plugin = IntroScreenPlugin::builder()
         .preferences(preferences)
         .failure_manager(OnFailureContinue)
         .build();
@@ -51,7 +51,7 @@ Please note that the examples provided here are simplified and serve as a starti
 
 For more examples, please refer to the examples directory.
 
-## Usage Beyond Splash Screens
+## Usage Beyond Intro Screens
 
 While primarily designed for splash screens, this library can be adapted to function as a loading screen between game states
 

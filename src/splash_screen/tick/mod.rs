@@ -6,16 +6,16 @@ pub use fixed::*;
 
 use bevy::{ecs::schedule::SystemConfigs, prelude::*, state::state::FreelyMutableState};
 
-use super::{state::is_running, ShowSplashScreen, SplashPreferences};
+use super::{state::is_running, ShowIntroScreen, IntroPreferences};
 
 /// Defines a trait for configuring the splash screen duration.
-pub trait SplashDuration: Resource + Clone {
-    /// Configures the splash screen based on the provided `SplashPreferences`.
-    fn configure_duration<S, D, U>(&self, app: &mut App, preferences: &SplashPreferences<S, D, U>)
+pub trait IntroDuration: Resource + Clone {
+    /// Configures the splash screen based on the provided `IntroPreferences`.
+    fn configure_duration<S, D, U>(&self, app: &mut App, preferences: &IntroPreferences<S, D, U>)
     where
         S: States + FreelyMutableState,
-        D: SplashDuration,
-        U: ShowSplashScreen;
+        D: IntroDuration,
+        U: ShowIntroScreen;
 
     /// This helper function should be used for systems added using this trait to guarantee
     /// that they are executed only when necessary.

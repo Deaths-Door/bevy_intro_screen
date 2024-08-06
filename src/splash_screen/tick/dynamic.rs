@@ -2,9 +2,9 @@ use std::time::Duration;
 
 use bevy::{prelude::*, state::state::FreelyMutableState};
 
-use crate::splash_screen::{ShowSplashScreen, SplashPreferences, SplashState};
+use crate::splash_screen::{ShowIntroScreen, IntroPreferences, IntroState};
 
-use super::{FixedDuration, SplashDuration};
+use super::{FixedDuration, IntroDuration};
 
 /// Represents the possible states of a dynamic duration.
 #[derive(States, Clone, PartialEq, Eq, Hash, Debug, Default)]
@@ -45,12 +45,12 @@ impl AsRef<FixedDuration<DynamicDurationState>> for GenericDynamicDuration {
     }
 }
 
-impl SplashDuration for GenericDynamicDuration {
-    fn configure_duration<S, D, U>(&self, app: &mut App, preferences: &SplashPreferences<S, D, U>)
+impl IntroDuration for GenericDynamicDuration {
+    fn configure_duration<S, D, U>(&self, app: &mut App, preferences: &IntroPreferences<S, D, U>)
     where
         S: States + FreelyMutableState,
-        D: SplashDuration,
-        U: ShowSplashScreen,
+        D: IntroDuration,
+        U: ShowIntroScreen,
     {
         app.init_state::<DynamicDurationState>();
 
@@ -72,15 +72,15 @@ impl SplashDuration for GenericDynamicDuration {
 
 fn finish_splash<S, D, U>(
     mut next_state: ResMut<NextState<S>>,
-    preferences: Res<SplashPreferences<S, D, U>>,
+    preferences: Res<IntroPreferences<S, D, U>>,
 ) where
     S: bevy::prelude::States + FreelyMutableState + Clone,
-    D: SplashDuration,
-    U: ShowSplashScreen,
+    D: IntroDuration,
+    U: ShowIntroScreen,
 {
     next_state.set(preferences.transition_to.clone())
 }
 
-fn change_to_failure(mut next_state: ResMut<NextState<SplashState>>) {
-    next_state.set(SplashState::Failure)
+fn change_to_failure(mut next_state: ResMut<NextState<IntroState>>) {
+    next_state.set(IntroState::Failure)
 }

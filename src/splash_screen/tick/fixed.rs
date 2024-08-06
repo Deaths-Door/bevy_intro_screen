@@ -1,9 +1,9 @@
 use bevy::{prelude::*, state::state::FreelyMutableState, time::Timer};
 use std::time::Duration;
 
-use crate::splash_screen::{ShowSplashScreen, SplashPreferences};
+use crate::splash_screen::{ShowIntroScreen, IntroPreferences};
 
-use super::SplashDuration;
+use super::IntroDuration;
 
 /// Represents a fixed-duration countdown for the splash screen that transitions to a specified state upon completion.
 #[derive(Clone, Debug, Resource)]
@@ -35,15 +35,15 @@ where
     }
 }
 
-impl<S> SplashDuration for FixedDuration<S>
+impl<S> IntroDuration for FixedDuration<S>
 where
     S: States + FreelyMutableState,
 {
-    fn configure_duration<_State, D, U>(&self, app: &mut App, _: &SplashPreferences<_State, D, U>)
+    fn configure_duration<_State, D, U>(&self, app: &mut App, _: &IntroPreferences<_State, D, U>)
     where
         _State: States + FreelyMutableState,
-        D: SplashDuration,
-        U: ShowSplashScreen,
+        D: IntroDuration,
+        U: ShowIntroScreen,
     {
         app.insert_resource(self.clone())
             .add_systems(Update, Self::only_run_if(Self::tick_time));

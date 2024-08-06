@@ -3,23 +3,23 @@ use std::marker::PhantomData;
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 
-use crate::splash_screen::SplashState;
+use crate::splash_screen::IntroState;
 
-use super::ShowSplashScreen;
+use super::ShowIntroScreen;
 
 /// Handles loading assets for the splash screen
-pub struct SplashAssetLoader<T>
+pub struct IntroAssetLoader<T>
 where
     T: AssetCollection,
 {
     _phantom: PhantomData<T>,
 }
 
-impl<T> SplashAssetLoader<T>
+impl<T> IntroAssetLoader<T>
 where
     T: AssetCollection,
 {
-    // Creates SplashAssetLoader
+    // Creates IntroAssetLoader
     pub const fn new() -> Self {
         Self {
             _phantom: PhantomData::<T>,
@@ -27,23 +27,23 @@ where
     }
 }
 
-impl<T> ShowSplashScreen for SplashAssetLoader<T>
+impl<T> ShowIntroScreen for IntroAssetLoader<T>
 where
     T: AssetCollection,
 {
     fn configure_ui<S, D, U>(
         &self,
         app: &mut bevy::prelude::App,
-        preferences: &crate::splash_screen::SplashPreferences<S, D, U>,
+        preferences: &crate::splash_screen::IntroPreferences<S, D, U>,
     ) where
         S: bevy::prelude::States,
-        D: crate::splash_screen::SplashDuration,
-        U: ShowSplashScreen,
+        D: crate::splash_screen::IntroDuration,
+        U: ShowIntroScreen,
     {
         app.add_loading_state(
-            LoadingState::new(SplashState::Loading)
-                .continue_to_state(SplashState::Running)
-                .on_failure_continue_to_state(SplashState::Failure)
+            LoadingState::new(IntroState::Loading)
+                .continue_to_state(IntroState::Running)
+                .on_failure_continue_to_state(IntroState::Failure)
                 .load_collection::<T>(),
         );
 
