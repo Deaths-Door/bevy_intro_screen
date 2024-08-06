@@ -7,6 +7,7 @@ authors = ["Aarav Shah <aaravaditya51@gmail.com>"]
 description = "Highly customizable introductio n(splash) screen library for Bevy games"
 repository = "https://github.com/Deaths-Door/bevy_intro_screen"
 homepage = "https://github.com/Deaths-Door/bevy_intro_screen"
+documentation = "https://docs.rs/bevy_intro_screen"
 license = "MIT OR Apache-2.0"
 
 [features]
