@@ -27,5 +27,4 @@ pub mod prelude {
 pub use bevy_egui;
 
 #[cfg(feature="assets")]
-pub use bevy_asset_loader 
-
+pub use bevy_asset_loader;
