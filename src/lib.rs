@@ -22,3 +22,10 @@ pub mod prelude {
 
     pub use crate::splash_screen::ui::*;
 }
+
+#[cfg(feature="egui")]
+pub use bevy_egui;
+
+#[cfg(feature="assets")]
+pub use bevy_asset_loader 
+
