@@ -28,6 +28,30 @@ fn main() {
 #[derive(Resource,Clone)]
 pub struct DownloadAllAssets;
 
+#[derive(States,Clone ,PartialEq , Eq , Hash , Debug,Copy)]
+pub enum Stage {
+    Models,
+    Audio,
+    Vfx,
+    UserSettings,
+    Etc
+}
+
+
+
+impl ShowIntroScreen for GameIntroScreen {
+    fn configure_ui<S, D, U>(&self, app: &mut App, _: &IntroPreferences<S, D, U>)
+        where
+            S: States,
+            D: IntroDuration,
+            U: ShowIntroScreen {
+        app.init_state::<Stage>();
+
+        // Now you can display some text based on the downloading state
+        // app.add_system(Update,show_text.run_if(in_state(..)))
+    }
+}
+
 impl IntroDuration for DownloadAllAssets {
     fn configure_duration<S, D, U>(&self, app: &mut App, _: &IntroPreferences<S, D, U>)
         where
@@ -40,19 +64,22 @@ impl IntroDuration for DownloadAllAssets {
     }
 }
 
-fn download_assets(next_state : Res<NextState<DynamicDurationState>>) {
+fn download_assets(intro_next_state : Res<NextState<DynamicDurationState>>,stage_next_state : Res<NextState<Stage>>) {
     AsyncComputeTaskPool::get().spawn(||{
         let mut rng = rand::thread_rng();
 
-        // Varied duration required for completion
-        std::thread::sleep(Duration::from_secs(rng.gen_range(3..10)));
+        let options = [Models,Audio, Vfx, UserSettings, Etc];
+        
+        for (index,variant) in &options.enumerate() {
+            // Varied duration required for completion
+            std::thread::sleep(Duration::from_secs(rng.gen_range(2..5)));
 
-        let state = match rand::gen_range(0..100) % 4 == 0 {
-            true => DynamicDurationState::Completed,
-            false => DynamicDurationState::Failure
-        };
+            if index < options.len() {
+                stage_next_state.set(options[index + 1]);
+            }   
+        }
 
-        next_state.set(state);
+        intro_next_state.set(state);
     });
 }
 
@@ -65,13 +92,3 @@ pub enum AppState {
 
 #[derive(Clone)]
 pub struct GameIntroScreen;
-
-impl ShowIntroScreen for GameIntroScreen {
-    fn configure_ui<S, D, U>(&self, _: &mut App, _: &IntroPreferences<S, D, U>)
-        where
-            S: States,
-            D: IntroDuration,
-            U: ShowIntroScreen {
-        // Do nothing
-    }
-}
