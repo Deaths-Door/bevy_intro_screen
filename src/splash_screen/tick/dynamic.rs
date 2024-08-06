@@ -13,9 +13,9 @@ pub enum DynamicDurationState {
     /// Indicates a failure during the dynamic duration calculation.
     Failure,
     /// Indicates that the dynamic duration has completed.
-    #[default]
     Completed,
     /// Indicates that the dynamic duration is currently running.
+    #[default]
     Running,
 }
 
