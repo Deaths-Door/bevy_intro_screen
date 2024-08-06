@@ -79,7 +79,7 @@ fn download_assets(intro_next_state : Res<NextState<DynamicDurationState>>,stage
             }   
         }
 
-        intro_next_state.set(state);
+        intro_next_state.set(DynamicDurationState::Completed);
     });
 }
 
