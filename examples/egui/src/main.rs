@@ -34,7 +34,7 @@ impl Plugin for AppPlugin {
             .transition_to(transition_to)
             .skip_on_input(true)
             .duration(FixedDuration::new_with_duration(
-                Duration::from_millis(10000000),
+                Duration::from_millis(5000),
                 transition_to,
             ))
             .ui(GameIntroScreen)
