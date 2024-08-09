@@ -1,33 +1,57 @@
 use bevy::prelude::*;
-use bevy_intro_screen::prelude::*;
-
-fn main() {
-    let transition_to = AppState::GameMenu;
-    let preferences = IntroPreferences::builder()
-        .run_at(AppState::IntroScreen)
-        .transition_to(transition_to)
-        .skip_on_input(true)
-        .duration(FixedDuration::new(transition_to))
-        .ui(GameIntroScreen)
-        .build();
-
-    let splash_plugin = IntroScreenPlugin::builder()
-        .preferences(preferences)
-        .failure_manager(OnFailureContinue)
-        .build();
-
+use bevy_intro_screen::prelude::{*,egui::EguiIntroScreen};
+use bevy_egui::EguiContexts;
+use std::time::Duration;
+fn main() {    
     App::new()
-        .add_plugins(DefaultPlugins)
-        .add_plugins(splash_plugin)
-        .run()
+        .add_plugins(AppPlugin)
+        .run();
 }
 
+const APP_NAME: &'static str = "My game";
 
-#[derive(Clone)]
-pub struct GameIntroScreen;
+const LABEL: &'static str = "EGUI INTRO SCREEN";
 
-impl GameIntroScreen {
-    pub(super) const LABEL: &'static str = "Custom Egui Example";
+pub struct AppPlugin;
+impl Plugin for AppPlugin {
+    fn build(&self,app: &mut App) {
+        app.add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                title: String::from(APP_NAME),
+                ..Default::default()
+            }),
+            close_when_requested: true,
+            ..Default::default()
+        }));
+
+        app.add_systems(Startup, setup);
+
+        app.init_state::<AppState>();
+
+        let transition_to = AppState::GameMenu;
+        let preferences = IntroPreferences::builder()
+            .run_at(AppState::SplashScreen)
+            .transition_to(transition_to)
+            .skip_on_input(true)
+            .duration(FixedDuration::new_with_duration(
+                Duration::from_millis(10000000),
+                transition_to,
+            ))
+            .ui(GameIntroScreen)
+            .build();
+
+        let intro_plugin = IntroScreenPlugin::builder()
+            .preferences(preferences)
+            .failure_manager(OnFailureContinue)
+            .build();
+
+        app.add_plugins(intro_plugin);
+    }
+}
+
+fn setup(contexts: EguiContexts,mut commands : Commands) {
+    egui_extras::install_image_loaders(contexts.ctx());
+    commands.spawn(Camera2dBundle::default());
 }
 
 impl ShowIntroScreen for GameIntroScreen {
@@ -37,30 +61,26 @@ impl ShowIntroScreen for GameIntroScreen {
         D: IntroDuration,
         U: ShowIntroScreen,
     {
-        // so that the image loader is loaded and has enought time to do so
-        app.add_systems(Startup, setup);
-
-            
         let egui = EguiIntroScreen::builder()
-            .label(Self::LABEL.into())
-            .icon(bevy_egui::egui::include_image!(
-                "../../assets/images/app_logo.png"
-            ))
-            .build();
+        .label(LABEL.into())
+        .icon(bevy_egui::egui::include_image!(
+            "../../../assets/images/app_logo.png"
+        ))
+        .background(bevy_egui::egui::include_image!("../../../assets/images/blue_background.png"))
+        .build();
 
-        egui.configure_ui(app, preferences);
-    }
+    egui.configure_ui(app, preferences);
+
+ }
 }
 
-fn setup(contexts: EguiContexts) {
-    egui_extras::install_image_loaders(contexts.ctx());
-}
+#[derive(Clone)]
+pub struct GameIntroScreen;
 
-
-// Same --
-
-#[derive(States,Clone ,PartialEq , Eq , Hash , Debug,Copy)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, Default, States)]
 pub enum AppState {
-    IntroScreen,
-    Menu
+    #[default]
+    SplashScreen,
+
+    GameMenu,
 }

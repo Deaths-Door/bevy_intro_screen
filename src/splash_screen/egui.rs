@@ -3,14 +3,14 @@ use std::borrow::Cow;
 use bevy::prelude::*;
 use bevy_egui::{
     egui::{
-        CentralPanel, Color32, Image as EguiImage, ImageSource, RichText, TopBottomPanel, Vec2,
+        CentralPanel, Color32, Image as EguiImage, ImageSource, RichText, TopBottomPanel,
         Widget,
     },
     EguiContexts, EguiPlugin,
 };
 
 use super::{is_running, ShowIntroScreen, IntroFailureManager};
-
+use crate::prelude::IntroState;
 #[derive(Resource, Clone)]
 #[bon::builder]
 pub struct EguiIntroScreen<'a> {
@@ -42,8 +42,15 @@ where
 
         app.insert_resource(self.clone());
 
+        // This is required to that as no asset loader is registered then manually change the state of the splash screen
+        app.add_systems(OnEnter(IntroState::Loading),manual_change_load_state);
+
         app.add_systems(Update, splash.run_if(is_running));
     }
+}
+
+fn manual_change_load_state(mut next_state : ResMut<NextState<IntroState>>) {
+    next_state.set(IntroState::Running)
 }
 
 fn splash(contexts: EguiContexts, assets: Res<EguiIntroScreen<'static>>) {
