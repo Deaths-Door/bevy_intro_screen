@@ -11,6 +11,27 @@ documentation = "https://docs.rs/bevy_intro_screen"
 license = "MIT OR Apache-2.0"
 
 [features]
+# ## Special Steps 
+# 1. Enable the `egui_ui` feature in `bevy_intro_screen`
+# 2. `egui_extras` crate 
+# ```toml
+# # Or other features
+# egui_extras = { version = "0.28.1", features = ["image"] }
+# ``
+# 3. **Camera:** Ensure a `Camera2dBundle` or `Camera3dBundle` is present 
+# for UI rendering.
+# 4. **Initialize Image Loader**
+# 
+# ```rust,no_run
+# use bevy_intro_screen::egui::EguiContexts;
+# 
+# fn setup(contexts: EguiContexts) {
+#     egui_extras::install_image_loaders(contexts.ctx());
+# }
+# // ....
+# ```
+# Add this system to your app (usually the `Startup` scheudule).
+# 5. The remaining steps are identical to standard usual p or refer to the [example](https://github.com/Deaths-Door/bevy_intro_screen/blob/main/examples/egui/src/main.rs#L64).
 egui = ["bevy_egui"]
 assets = ["bevy_asset_loader"]
 
