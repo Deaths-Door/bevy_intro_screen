@@ -117,6 +117,6 @@ where
     });
 }
 
-fn clean_up<T: Resource>(mut commands: Commands) {
-    commands.remove_resource::<T>()
+fn clean_up<T: Resource>(commands: Commands) {
+  //  commands.remove_resource::<T>()
 }

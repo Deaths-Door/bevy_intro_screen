@@ -1,4 +1,5 @@
 #[cfg(feature = "egui")]
+///
 pub mod egui;
 pub(super) mod skip_screen;
 pub(super) mod state;
@@ -33,6 +34,7 @@ where
 /// * `S`: The state type used by the application.
 /// * `D`: The splash screen duration type.
 /// * `U`: The type responsible for showing the splash screen
+#[allow(missing_docs)]
 #[derive(Clone, Debug, Resource, Getters)]
 #[bon::builder]
 pub struct IntroPreferences<S, D, U>

@@ -157,7 +157,7 @@ where
         U: ShowIntroScreen,
     {
         app.insert_resource(self.clone())
-            .add_systems(schedule, Self::system);
+            .add_systems(Update, Self::system.run_if(in_state(schedule.0)));
     }
 }
 

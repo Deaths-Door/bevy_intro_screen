@@ -51,9 +51,9 @@ where
     }
 }
 
-fn remove_asset<T>(mut cmds: Commands)
+fn remove_asset<T>(cmds: Commands)
 where
     T: AssetCollection,
 {
-    cmds.remove_resource::<T>()
+  //  cmds.remove_resource::<T>()
 }

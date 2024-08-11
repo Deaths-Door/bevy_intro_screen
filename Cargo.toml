@@ -61,6 +61,27 @@ features = [
     "bevy_audio",
 ]
 
+[dev-dependencies]
+# For egui_ui example
+egui_extras = { version = "0.28.1" , features = ["image"] }
+# For dynamic_duration example
+strum = { version = "0.26.3" , features = ["derive"]}
+
+[[example]]
+name = "egui_ui"
+path = "examples/egui.rs"
+required-features = ["bevy/bevy_winit","egui"]
+
+[[example]]
+name = "custom_failure_manager"
+path = "examples/custom_failure_manager.rs"
+required-features = ["bevy/bevy_winit","egui"]
+
+[[example]]
+name = "dynamic_duration"
+path = "examples/dynamic_duration.rs"
+required-features = ["bevy/bevy_winit","bevy/bevy_dev_tools","egui"]
+
 # Enable a small amount of optimization in debug mode.
 [profile.dev]
 opt-level = 1
@@ -87,22 +108,3 @@ inherits = "release"
 opt-level = "z"
 # Strip all debugging information from the binary to reduce file size.
 strip = "debuginfo"
-
-[dev-dependencies]
-# For egui_ui example
-egui_extras = { version = "0.28.1" , features = ["image"] }
-
-[[example]]
-name = "egui_ui"
-path = "examples/egui.rs"
-required-features = ["bevy/bevy_winit","egui"]
-
-[[example]]
-name = "custom_failure_manager"
-path = "examples/custom_failure_manager.rs"
-required-features = ["bevy/bevy_winit","egui"]
-
-[[example]]
-name = "dynamic_duration"
-path = "examples/dynamic_duration/src/main.rs"
-required-features = ["bevy/bevy_winit","egui"]
