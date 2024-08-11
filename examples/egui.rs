@@ -42,40 +42,12 @@ impl Plugin for AppPlugin {
 
         let intro_plugin = IntroScreenPlugin::builder()
             .preferences(preferences)
-            // Main Difference
-            .failure_manager(LogFailure.and(OnFailureCloseWindow))
+            .failure_manager(OnFailureContinue)
             .build();
 
         app.add_plugins(intro_plugin);
-
-        app.add_systems(OnEnter(IntroState::Running),to_failure);
     }
 }
-
-fn to_failure(mut next_state : ResMut<NextState<IntroState>>) {
-    next_state.set(IntroState::Failure)
-}
-
-
-#[derive(Clone)]
-pub struct LogFailure;
-impl IntroFailureManager for LogFailure {
-    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<IntroState>)
-    where
-        S: States + bevy::state::state::FreelyMutableState,
-        D: IntroDuration,
-        U: ShowIntroScreen,
-    {
-        app.add_systems(schedule, log);
-    }
-}
-
-fn log(_: Commands) {
-    eprintln!("the game has failed!!!1");
-}
-
-
-// Same as EGUI example
 
 fn setup(contexts: EguiContexts,mut commands : Commands) {
     egui_extras::install_image_loaders(contexts.ctx());

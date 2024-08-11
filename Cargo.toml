@@ -11,8 +11,37 @@ documentation = "https://docs.rs/bevy_intro_screen"
 license = "MIT OR Apache-2.0"
 
 [features]
+# ## Special Steps 
+# 1. Enable the `egui_ui` feature in `bevy_intro_screen`
+# 2. `egui_extras` crate 
+# ```toml
+# # Or other features
+# egui_extras = { version = "0.28.1", features = ["image"] }
+# ``
+# 3. **Camera:** Ensure a `Camera2dBundle` or `Camera3dBundle` is present 
+# for UI rendering.
+# 4. **Initialize Image Loader**
+# 
+# ```rust,no_run
+# use bevy_intro_screen::egui::EguiContexts;
+# 
+# fn setup(contexts: EguiContexts) {
+#     egui_extras::install_image_loaders(contexts.ctx());
+# }
+# // ....
+# ```
+# Add this system to your app (usually the `Startup` scheudule).
+# 5. The remaining steps are identical to standard usual p or refer to the [example](https://github.com/Deaths-Door/bevy_intro_screen/blob/main/examples/egui/src/main.rs#L64).
 egui = ["bevy_egui"]
 assets = ["bevy_asset_loader"]
+
+[package.metadata.docs.rs]
+
+# Features to pass to Cargo (default: [])
+features = ["egui_ui", "assets"]
+
+# Whether to pass `--all-features` to Cargo (default: false)
+all-features = true
 
 [dependencies]
 bon = "1.0.6"
@@ -31,6 +60,27 @@ features = [
     "bevy_state", 
     "bevy_audio",
 ]
+
+[dev-dependencies]
+# For egui_ui example
+egui_extras = { version = "0.28.1" , features = ["image"] }
+# For dynamic_duration example
+strum = { version = "0.26.3" , features = ["derive"]}
+
+[[example]]
+name = "egui_ui"
+path = "examples/egui.rs"
+required-features = ["bevy/bevy_winit","egui"]
+
+[[example]]
+name = "custom_failure_manager"
+path = "examples/custom_failure_manager.rs"
+required-features = ["bevy/bevy_winit","egui"]
+
+[[example]]
+name = "dynamic_duration"
+path = "examples/dynamic_duration.rs"
+required-features = ["bevy/bevy_winit","bevy/bevy_dev_tools","egui"]
 
 # Enable a small amount of optimization in debug mode.
 [profile.dev]
@@ -58,16 +108,3 @@ inherits = "release"
 opt-level = "z"
 # Strip all debugging information from the binary to reduce file size.
 strip = "debuginfo"
-
-[[example]]
-name = "egui"
-path = "examples/egui/main.rs"
-required-features = ["egui"]
-
-[[example]]
-name = "custom_failure_manager"
-path = "examples/custom_failure_manager.rs"
-
-[[example]]
-name = "dynamic_duration"
-path = "examples/dynamic_duration/main.rs"

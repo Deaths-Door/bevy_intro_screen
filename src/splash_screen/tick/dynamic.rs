@@ -31,9 +31,16 @@ pub struct GenericDynamicDuration {
 }
 
 impl GenericDynamicDuration {
+    /// Creates a new `GenericDynamicDuration` instance with the specified maximum duration.
+    ///
+    /// # Arguments
+    /// * `max_duration`: The maximum allowed duration. Can be any type that can be converted into a `Duration`.
+    ///
+    /// # Returns
+    /// A new `GenericDynamicDuration` instance.
     pub fn new(max_duration: impl Into<Duration>) -> Self {
         let max_duration =
-            FixedDuration::new_with_duration(max_duration.into(), DynamicDurationState::Completed);
+            FixedDuration::new_with_duration(max_duration.into(), DynamicDurationState::Failure);
 
         Self { max_duration }
     }
@@ -53,11 +60,12 @@ impl IntroDuration for GenericDynamicDuration {
         U: ShowIntroScreen,
     {
         app.init_state::<DynamicDurationState>();
+        app.insert_resource(self.clone());
 
         app.add_systems(
             Update,
             Self::only_run_if(
-                finish_splash::<S, Self, U>.run_if(in_state(DynamicDurationState::Completed)),
+                finish_splash::<S, D, U>.run_if(in_state(DynamicDurationState::Completed)),
             ),
         );
 

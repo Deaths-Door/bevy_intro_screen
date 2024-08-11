@@ -1,7 +1,10 @@
+
 use bevy::prelude::*;
 use bevy_intro_screen::prelude::{*,egui::EguiIntroScreen};
 use bevy_egui::EguiContexts;
 use std::time::Duration;
+use strum::{IntoEnumIterator,EnumIter};
+use bevy::dev_tools::states::log_transitions;
 fn main() {    
     App::new()
         .add_plugins(AppPlugin)
@@ -27,56 +30,68 @@ impl Plugin for AppPlugin {
         app.add_systems(Startup, setup);
 
         app.init_state::<AppState>();
-
+        
         let transition_to = AppState::GameMenu;
         let preferences = IntroPreferences::builder()
             .run_at(AppState::SplashScreen)
             .transition_to(transition_to)
             .skip_on_input(true)
-            .duration(FixedDuration::new_with_duration(
-                Duration::from_millis(5000),
-                transition_to,
-            ))
+            .duration(DownloadAllAssets)
             .ui(GameIntroScreen)
             .build();
 
         let intro_plugin = IntroScreenPlugin::builder()
             .preferences(preferences)
-            // Main Difference
-            .failure_manager(LogFailure.and(OnFailureCloseWindow))
+            .failure_manager(OnFailureContinue)
             .build();
 
         app.add_plugins(intro_plugin);
 
-        app.add_systems(OnEnter(IntroState::Running),to_failure);
+        // Change of states is visible from the logs produced by these
+        app.add_systems(Update, (log_transitions::<DownloadState>,log_transitions::<DynamicDurationState>));
     }
 }
 
-fn to_failure(mut next_state : ResMut<NextState<IntroState>>) {
-    next_state.set(IntroState::Failure)
+#[derive(Resource,Clone)]
+pub struct DownloadAllAssets;
+
+#[derive(States,EnumIter,Clone ,PartialEq , Eq , Hash , Debug,Copy,Default)]
+pub enum DownloadState {
+    #[default]
+    Models,
+    Audio,
+    UserSettings
 }
 
+impl IntroDuration for DownloadAllAssets {
+    fn configure_duration<S, D, U>(&self, app: &mut App, preferences: &IntroPreferences<S, D, U>)
+        where
+            S: States + bevy::state::state::FreelyMutableState,
+            D: IntroDuration,
+            U: ShowIntroScreen {
+        app.init_state::<DownloadState>();
 
-#[derive(Clone)]
-pub struct LogFailure;
-impl IntroFailureManager for LogFailure {
-    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<IntroState>)
-    where
-        S: States + bevy::state::state::FreelyMutableState,
-        D: IntroDuration,
-        U: ShowIntroScreen,
-    {
-        app.add_systems(schedule, log);
+        let generic = GenericDynamicDuration::new(Duration::from_secs(60));
+        generic.configure_duration(app,preferences);
+
+        app.add_systems(OnEnter(IntroState::Running),download_assets);
     }
 }
 
-fn log(_: Commands) {
-    eprintln!("the game has failed!!!1");
+fn download_assets(mut intro_next_state : ResMut<NextState<DynamicDurationState>>,mut stage_next_state : ResMut<NextState<DownloadState>>) {
+    for (index,_) in DownloadState::iter().enumerate() {
+        // Varied duration required for completion
+        std::thread::sleep(Duration::from_secs(index as u64));
+
+        if let Some(state) = DownloadState::iter().nth(index + 1usize) {
+            stage_next_state.set(state);
+        }
+    }
+
+    intro_next_state.set(DynamicDurationState::Completed);
 }
 
-
-// Same as EGUI example
-
+// ---- Same as egui example ----
 fn setup(contexts: EguiContexts,mut commands : Commands) {
     egui_extras::install_image_loaders(contexts.ctx());
     commands.spawn(Camera2dBundle::default());
