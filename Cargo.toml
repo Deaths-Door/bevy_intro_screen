@@ -100,9 +100,9 @@ required-features = ["bevy/bevy_winit","egui"]
 [[example]]
 name = "custom_failure_manager"
 path = "examples/custom_failure_manager.rs"
-required-features = ["bevy/bevy_winit"]
+required-features = ["bevy/bevy_winit","egui"]
 
 [[example]]
 name = "dynamic_duration"
 path = "examples/dynamic_duration/src/main.rs"
-required-features = ["bevy/bevy_winit","bevy/bevy_text","bevy/bevy_ui"]
+required-features = ["bevy/bevy_winit","egui"]
