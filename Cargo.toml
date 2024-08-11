@@ -94,7 +94,7 @@ egui_extras = { version = "0.28.1" , features = ["image"] }
 
 [[example]]
 name = "egui_ui"
-path = "examples/egui/src/main.rs"
+path = "examples/egui.rs"
 required-features = ["bevy/bevy_winit","egui"]
 
 [[example]]

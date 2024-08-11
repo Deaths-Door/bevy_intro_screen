@@ -64,9 +64,9 @@ impl ShowIntroScreen for GameIntroScreen {
         let egui = EguiIntroScreen::builder()
         .label(LABEL.into())
         .icon(bevy_egui::egui::include_image!(
-            "../../../assets/images/app_logo.png"
+            "../assets/images/app_logo.png"
         ))
-        .background(bevy_egui::egui::include_image!("../../../assets/images/blue_background.png"))
+        .background(bevy_egui::egui::include_image!("../assets/images/blue_background.png"))
         .build();
 
     egui.configure_ui(app, preferences);
