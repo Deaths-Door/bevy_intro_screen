@@ -66,8 +66,7 @@ struct GameScreenAssets {
 
 impl IntroScreenAssets for GameScreenAssets {
     fn background(&self) -> Option<&Handle<Image>> {
-        None
-        //Some(&self.background)
+        Some(&self.background)
     }
 
     fn icon(&self) -> &Handle<Image> {

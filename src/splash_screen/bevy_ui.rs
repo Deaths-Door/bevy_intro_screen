@@ -46,7 +46,7 @@ struct BevyUiMarker;
 
 
 // the zindex the label an dicon is spawned on so that more entities can be spawned 'below' and 'above' them
-pub const BEVY_INTRO_SCREEN_CONTENT_ZINDEX : ZIndex = ZIndex::Local(0);
+pub const BEVY_INTRO_SCREEN_CONTENT_ZINDEX : ZIndex = ZIndex::Local(10);
 
 fn despawn_ui<T>(mut commands : Commands,query : Query<Entity,With<BevyUiMarker>>) where T : IntroScreenAssets {
     commands.entity(query.single()).despawn_recursive();
@@ -103,10 +103,8 @@ impl BevyIconMarker {
                     ..Default::default()
                 },
                 style : Style {
-                 //   height : Val::Px(150.0),
-               //     width : Val::Px(150.0),
-                    max_height : Val::Px(150.0),
-                    max_width : Val::Px(150.0),
+                    max_height : Val::Px(200.0),
+                    max_width : Val::Px(200.0),
                     ..Default::default()
                 },
                 z_index : BEVY_INTRO_SCREEN_CONTENT_ZINDEX,
@@ -124,8 +122,7 @@ impl BevyLabelMarker {
                 text : Text::from_section(
                     label,
                     TextStyle {
-                        font_size : 64.0,
-                        color : Color::rgb(255.0,0.0,0.0),
+                        font_size : 36.0,
                         ..Default::default()
                     }
                 ),
@@ -157,6 +154,15 @@ fn main_content<T>(builder : &mut ChildBuilder<'_>,assets : Res<T>) where T: Int
         }
     )).with_children(|layout| {
         layout.spawn(BevyIconMarker::bundle(assets.icon()));
+        layout.spawn(
+            NodeBundle {
+                style : Style {
+                    margin : UiRect::bottom(Val::Px(25.0)),
+                    ..Default::default()
+                },
+                ..Default::default()
+            }
+        );
         layout.spawn(BevyLabelMarker::bundle(&assets.label()));
     });
 }
