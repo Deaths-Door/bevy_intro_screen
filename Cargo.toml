@@ -31,14 +31,18 @@ license = "MIT OR Apache-2.0"
 # // ....
 # ```
 # Add this system to your app (usually the `Startup` scheudule).
-# 5. The remaining steps are identical to standard usual p or refer to the [example](https://github.com/Deaths-Door/bevy_intro_screen/blob/main/examples/egui/src/main.rs#L64).
+# 5. The remaining steps are identical to standard usual or refer to the [example](https://github.com/Deaths-Door/bevy_intro_screen/blob/main/examples/egui/src/main.rs#L64).
 egui = ["bevy_egui"]
+
+# ## Special Steps
+# **Note:** Include the neccessary assets loaders based on the file formats that you intend to use
+bevy_ui = ["assets","bevy/bevy_ui"]
 assets = ["bevy_asset_loader"]
 
 [package.metadata.docs.rs]
 
 # Features to pass to Cargo (default: [])
-features = ["egui_ui", "assets"]
+features = ["egui_ui","bevy_ui" , "assets"]
 
 # Whether to pass `--all-features` to Cargo (default: false)
 all-features = true
@@ -66,6 +70,8 @@ features = [
 egui_extras = { version = "0.28.1" , features = ["image"] }
 # For dynamic_duration example
 strum = { version = "0.26.3" , features = ["derive"]}
+# For bevy_ui feature example
+bevy_asset_loader = "0.21.0"
 
 [[example]]
 name = "egui_ui"
@@ -81,6 +87,12 @@ required-features = ["bevy/bevy_winit","egui"]
 name = "dynamic_duration"
 path = "examples/dynamic_duration.rs"
 required-features = ["bevy/bevy_winit","bevy/bevy_dev_tools","egui"]
+
+[[example]]
+name = "bevy_ui"
+path = "examples/bevy.rs"
+required-features = ["bevy/bevy_winit","bevy/png","bevy/default_font","bevy_ui"]
+
 
 # Enable a small amount of optimization in debug mode.
 [profile.dev]

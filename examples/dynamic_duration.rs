@@ -13,7 +13,7 @@ fn main() {
 
 const APP_NAME: &'static str = "My game";
 
-const LABEL: &'static str = "EGUI INTRO SCREEN";
+const LABEL: &'static str = "DYNAMIC_DURATION SCREEN";
 
 pub struct AppPlugin;
 impl Plugin for AppPlugin {
