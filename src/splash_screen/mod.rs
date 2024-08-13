@@ -1,6 +1,11 @@
 #[cfg(feature = "egui")]
 ///
 pub mod egui;
+
+#[cfg(feature="bevy_ui")]
+///
+pub mod bevy_ui;
+
 pub(super) mod skip_screen;
 pub(super) mod state;
 pub(super) mod tick;
@@ -34,7 +39,6 @@ where
 /// * `S`: The state type used by the application.
 /// * `D`: The splash screen duration type.
 /// * `U`: The type responsible for showing the splash screen
-#[allow(missing_docs)]
 #[derive(Clone, Debug, Resource, Getters)]
 #[bon::builder]
 pub struct IntroPreferences<S, D, U>

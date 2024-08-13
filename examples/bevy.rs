@@ -1,7 +1,8 @@
 use bevy::prelude::*;
-use bevy_intro_screen::prelude::{*,egui::EguiIntroScreen};
-use bevy_egui::EguiContexts;
+use bevy_intro_screen::prelude::{*,bevy_ui::BevyIntroScreen};
 use std::time::Duration;
+use bevy_asset_loader::prelude::AssetCollection;
+
 fn main() {    
     App::new()
         .add_plugins(AppPlugin)
@@ -10,7 +11,7 @@ fn main() {
 
 const APP_NAME: &'static str = "My game";
 
-const LABEL: &'static str = "CUSTOM_FAILURE_MANAGER SCREEN";
+const LABEL: &'static str = "BEVY_UI INTRO SCREEN";
 
 pub struct AppPlugin;
 impl Plugin for AppPlugin {
@@ -28,13 +29,16 @@ impl Plugin for AppPlugin {
 
         app.init_state::<AppState>();
 
+        use bevy::dev_tools::states::log_transitions;
+        app.add_systems(Update, (log_transitions::<AppState>,log_transitions::<IntroState>));
+
         let transition_to = AppState::GameMenu;
         let preferences = IntroPreferences::builder()
             .run_at(AppState::SplashScreen)
             .transition_to(transition_to)
             .skip_on_input(true)
             .duration(FixedDuration::new_with_duration(
-                Duration::from_millis(5000),
+                Duration::from_millis(500000000000000),
                 transition_to,
             ))
             .ui(GameIntroScreen)
@@ -42,44 +46,36 @@ impl Plugin for AppPlugin {
 
         let intro_plugin = IntroScreenPlugin::builder()
             .preferences(preferences)
-            // Main Difference
-            .failure_manager(LogFailure.and(OnFailureCloseWindow))
+            .failure_manager(OnFailureContinue)
             .build();
 
         app.add_plugins(intro_plugin);
-
-        app.add_systems(OnEnter(IntroState::Running),to_failure);
     }
 }
 
-fn to_failure(mut next_state : ResMut<NextState<IntroState>>) {
-    next_state.set(IntroState::Failure)
-}
-
-
-#[derive(Clone)]
-pub struct LogFailure;
-impl IntroFailureManager for LogFailure {
-    fn manage_failure<S, D, U>(&self, app: &mut App, schedule: OnEnter<IntroState>)
-    where
-        S: States + bevy::state::state::FreelyMutableState,
-        D: IntroDuration,
-        U: ShowIntroScreen,
-    {
-        app.add_systems(schedule, log);
-    }
-}
-
-fn log(_: Commands) {
-    eprintln!("the game has failed!!!1");
-}
-
-
-// Same as EGUI example
-
-fn setup(contexts: EguiContexts,mut commands : Commands) {
-    egui_extras::install_image_loaders(contexts.ctx());
+fn setup(mut commands : Commands) {
     commands.spawn(Camera2dBundle::default());
+}
+#[derive(AssetCollection, Resource)]
+struct GameScreenAssets {
+    #[asset(path = "../assets/images/blue_background.png")]
+    background: Handle<Image>,
+    #[asset(path = "../assets/images/app_logo.png")]
+    icon : Handle<Image>,
+}
+
+impl IntroScreenAssets for GameScreenAssets {
+    fn background(&self) -> Option<&Handle<Image>> {
+        Some(&self.background)
+    }
+
+    fn icon(&self) -> &Handle<Image> {
+        &self.icon
+    }
+
+    fn label(&self) -> String {
+        LABEL.to_string()
+    }
 }
 
 impl ShowIntroScreen for GameIntroScreen {
@@ -89,17 +85,9 @@ impl ShowIntroScreen for GameIntroScreen {
         D: IntroDuration,
         U: ShowIntroScreen,
     {
-        let egui = EguiIntroScreen::builder()
-        .label(LABEL.into())
-        .icon(bevy_egui::egui::include_image!(
-            "../assets/images/app_logo.png"
-        ))
-        .background(bevy_egui::egui::include_image!("../assets/images/blue_background.png"))
-        .build();
-
-    egui.configure_ui(app, preferences);
-
- }
+        IntroAssetLoader::<GameScreenAssets>::default().configure_ui(app,preferences);
+        BevyIntroScreen::<GameScreenAssets>::default().configure_ui(app, preferences);
+    }
 }
 
 #[derive(Clone)]
