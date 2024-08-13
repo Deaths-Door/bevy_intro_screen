@@ -1,6 +1,4 @@
 use std::marker::PhantomData;
-
-use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 
 use crate::splash_screen::IntroState;
@@ -15,12 +13,11 @@ where
     _phantom: PhantomData<T>,
 }
 
-impl<T> IntroAssetLoader<T>
+impl<T> Default for IntroAssetLoader<T>
 where
     T: AssetCollection,
 {
-    // Creates IntroAssetLoader
-    pub const fn new() -> Self {
+    fn default() -> Self {
         Self {
             _phantom: PhantomData::<T>,
         }
@@ -34,7 +31,7 @@ where
     fn configure_ui<S, D, U>(
         &self,
         app: &mut bevy::prelude::App,
-        preferences: &crate::splash_screen::IntroPreferences<S, D, U>,
+        _: &crate::splash_screen::IntroPreferences<S, D, U>,
     ) where
         S: bevy::prelude::States,
         D: crate::splash_screen::IntroDuration,
@@ -46,14 +43,6 @@ where
                 .on_failure_continue_to_state(IntroState::Failure)
                 .load_collection::<T>(),
         );
-
-        app.add_systems(OnExit(preferences.run_at.clone()), remove_asset::<T>);
     }
 }
 
-fn remove_asset<T>(cmds: Commands)
-where
-    T: AssetCollection,
-{
-  //  cmds.remove_resource::<T>()
-}
