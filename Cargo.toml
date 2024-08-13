@@ -1,6 +1,6 @@
 [package]
 name = "bevy_intro_screen"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 readme = "README.md"
 authors = ["Aarav Shah <aaravaditya51@gmail.com>"]
