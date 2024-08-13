@@ -63,3 +63,4 @@ jobs:
             --allow-branch main \
             --no-confirm \
             --no-verify \
+            --execute
