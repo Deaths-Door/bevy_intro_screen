@@ -67,7 +67,7 @@ features = [
 
 [dev-dependencies]
 # For egui_ui example
-egui_extras = { version = "0.28.1" , features = ["image"] }
+egui_extras = { version = "0.30.0" , features = ["image"] }
 # For dynamic_duration example
 strum = { version = "0.26.3" , features = ["derive"]}
 # For bevy_ui feature example
