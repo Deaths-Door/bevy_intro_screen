@@ -52,7 +52,7 @@ bon = "1.0.6"
 
 bevy_asset_loader = { version = "0.21.0", optional = true }
 
-bevy_egui = { version = "0.28.0" , features = ["immutable_ctx"] , optional = true }
+bevy_egui = { version = "0.32.0" , features = ["immutable_ctx"] , optional = true }
 
 getset = "0.1.2"
 
