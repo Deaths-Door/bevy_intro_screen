@@ -48,7 +48,7 @@ features = ["egui_ui","bevy_ui" , "assets"]
 all-features = true
 
 [dependencies]
-bon = "1.0.6"
+bon = "3.3.2"
 
 bevy_asset_loader = { version = "0.21.0", optional = true }
 
